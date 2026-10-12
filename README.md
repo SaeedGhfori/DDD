@@ -60,6 +60,33 @@ dotnet run --project src/Services/Notification/Notification.Presentation
 dotnet run --project src/ApiGateway/DDD.ApiGateway
 ```
 
+## First use case — `CreatePurchaseRequest`
+
+`POST /api/purchase-requests` creates a new purchase request from the requester,
+department and approver identifiers.
+
+```powershell
+dotnet run --project src/Services/Procurement/Procurement.Presentation
+# http://localhost:5101/api/purchase-requests
+```
+
+```http
+POST /api/purchase-requests
+{
+  "requesterId": "11111111-1111-1111-1111-111111111111",
+  "departmentId": "22222222-2222-2222-2222-222222222222",
+  "approverId": "33333333-3333-3333-3333-333333333333"
+}
+```
+
+Responses: `201 Created` on success, `400 Bad Request` for invalid input,
+`409 Conflict` for a domain rule violation.
+
+> **No persistence yet.** The request is created in memory by the Domain and is
+> **not stored**. The endpoint exists only to exercise the HTTP → Application →
+> Domain path; nothing survives the process. `ApproverId` is a temporary input
+> until an organization service can resolve the requester's department manager.
+
 ## Central Package Management
 
 NuGet versions are managed centrally. **All** package versions are declared in
@@ -80,14 +107,17 @@ Implemented in the current iteration:
 - Full solution / project skeleton with layer boundaries.
 - Shared build & package configuration, `.editorconfig`, `.gitignore`, `global.json`.
 - Initial `Procurement` domain model (`PurchaseRequest`, `PurchaseRequestItem`).
+- First application use case `CreatePurchaseRequest` (Application + Minimal API endpoint).
 - Minimal API entry points and a YARP-based API gateway reading routes from configuration.
-- Domain unit tests for `PurchaseRequest`.
+- Domain unit tests for `PurchaseRequest`, application tests for the use case,
+  layered-architecture tests and an initial HTTP integration test for the create endpoint.
 
 Not implemented yet (planned for later iterations):
 
-- Business endpoints for Procurement and Notification.
-- EF Core `DbContext`, model configuration and migrations.
-- Messaging / integration events between services (`DDD.Contracts`).
+- Persistence: the create endpoint does not store data (EF Core `DbContext`,
+  model configuration and migrations are still pending).
+- Remaining business endpoints (submit/approve/reject/return) for Procurement.
+- Notification business endpoints and messaging / integration events (`DDD.Contracts`).
 - Authentication, Docker, observability, resilience policies.
 
 See `docs/architecture` and `docs/decisions` for details.

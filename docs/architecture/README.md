@@ -61,6 +61,47 @@ src/Services/<Service>/
 - **Contracts:** `DDD.Contracts` is reserved for integration event contracts.
 - **Data ownership:** each service is expected to own its schema/database.
 
+## Domain modeling (Procurement)
+
+- [Ubiquitous Language](ubiquitous-language.md) — shared business vocabulary (v0.2).
+- [Domain Model v0.2](domain-model-v0.2.md) — scope, rules, scenarios, decisions,
+  assumptions and open questions.
+- [Chat 01 Final Review](chat-01-final-review.md) — architecture/test validation
+  and hand-off state for Chat 02.
+- [Chat 01 Audit Report](chat-01-audit-report.md) — evidence-based audit and
+  readiness decision.
+
+## First use case — `CreatePurchaseRequest` (Procurement)
+
+```
+HTTP  POST /api/purchase-requests
+  │
+  ▼
+Presentation   CreatePurchaseRequestEndpoint   (HTTP DTO, maps errors)
+  │            → CreatePurchaseRequestRequest  (separate from the domain entity)
+  ▼
+Application    CreatePurchaseRequestHandler    (orchestration only)
+  │            → CreatePurchaseRequestCommand / CreatePurchaseRequestResult
+  ▼
+Domain         new PurchaseRequest(id, requesterId, departmentId, approverId)
+               (identity guards + initial Status = Draft live here)
+```
+
+Responsibility boundaries:
+
+- **Domain** owns all rules (non-empty ids, `Draft` initial state, transitions).
+- **Application** orchestrates: builds the aggregate, returns id + status. It does
+  not re-implement domain validation and never mutates domain state directly.
+- **Presentation** owns the HTTP DTOs, handler invocation and error mapping
+  (`ArgumentException` → 400, `InvalidOperationException` → 409).
+
+Not yet implemented for this flow:
+
+- **No persistence.** The created request is not saved; nothing survives the
+  process. There is no repository / unit of work yet, by design.
+- **No approver resolution.** `ApproverId` is a temporary input until an
+  organization service can resolve the requester's department manager.
+
 ## Open points
 
 See `docs/decisions` for architecture decisions and items still open.

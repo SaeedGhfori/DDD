@@ -27,6 +27,25 @@ This folder records architecture decisions and explicitly-open questions.
 - **Observability**: logging sinks (Serilog), distributed tracing, metrics.
 - **Docker / local orchestration**: compose files and service images.
 
+## Procurement domain (Chat 01)
+
+### ADR-010 — Temporary: item editing is only allowed in `Draft` and `ReturnedForCorrection`
+- **Context:** The business states that editing is allowed until final approval,
+  but the exact editing behaviour while the request is in `Submitted` (who may
+  edit, what may change, whether it resets the approval) is not yet defined.
+- **Decision (temporary):** `PurchaseRequest.AddItem` is permitted only in
+  `Draft` or `ReturnedForCorrection`. Editing while `Submitted` is intentionally
+  disabled rather than guessed.
+- **Status:** Temporary. Revisit once the open question below is answered.
+
+### Open question — editing while `Submitted`
+Before final approval the request is currently locked once submitted. To fully
+align with the "editable until final approval" rule, the business must decide:
+- whether items can be added/removed/updated while `Submitted`;
+- whether an edit during `Submitted` keeps the request `Submitted` or returns it
+  to `Draft`/`ReturnedForCorrection`;
+- how self-approval interacts with edits made by the approver.
+
 ## Notes
 
 Nothing listed under "Open" is implemented yet; the projects are scaffolded so
