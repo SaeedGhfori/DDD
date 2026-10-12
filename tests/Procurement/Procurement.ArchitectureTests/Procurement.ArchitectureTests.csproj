@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
+    <PackageReference Include="coverlet.collector" PrivateAssets="all" />
+    <PackageReference Include="FluentAssertions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Services\Procurement\Procurement.Domain\Procurement.Domain.csproj" />
+    <ProjectReference Include="..\..\..\src\Services\Procurement\Procurement.Application\Procurement.Application.csproj" />
+    <ProjectReference Include="..\..\..\src\Services\Procurement\Procurement.Infrastructure\Procurement.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\src\Services\Procurement\Procurement.Persistence\Procurement.Persistence.csproj" />
+    <ProjectReference Include="..\..\..\src\Services\Procurement\Procurement.Presentation\Procurement.Presentation.csproj" />
+  </ItemGroup>
+
+</Project>

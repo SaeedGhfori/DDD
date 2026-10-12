@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Procurement.Domain\Procurement.Domain.csproj" />
+    <ProjectReference Include="..\Procurement.Application\Procurement.Application.csproj" />
+  </ItemGroup>
+
+</Project>

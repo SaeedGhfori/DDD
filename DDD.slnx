@@ -1,0 +1,65 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+    <File Path="README.md" />
+  </Folder>
+
+  <Folder Name="/deploy/">
+    <File Path="deploy/README.md" />
+  </Folder>
+  <Folder Name="/deploy/docker/">
+    <File Path="deploy/docker/README.md" />
+  </Folder>
+
+  <Folder Name="/docs/" />
+  <Folder Name="/docs/architecture/">
+    <File Path="docs/architecture/README.md" />
+  </Folder>
+  <Folder Name="/docs/decisions/">
+    <File Path="docs/decisions/README.md" />
+  </Folder>
+
+  <Folder Name="/src/" />
+  <Folder Name="/src/ApiGateway/">
+    <Project Path="src/ApiGateway/DDD.ApiGateway/DDD.ApiGateway.csproj" />
+  </Folder>
+  <Folder Name="/src/BuildingBlocks/">
+    <Project Path="src/BuildingBlocks/DDD.Contracts/DDD.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/src/Services/" />
+  <Folder Name="/src/Services/Notification/">
+    <Project Path="src/Services/Notification/Notification.Domain/Notification.Domain.csproj" />
+    <Project Path="src/Services/Notification/Notification.Application/Notification.Application.csproj" />
+    <Project Path="src/Services/Notification/Notification.Infrastructure/Notification.Infrastructure.csproj" />
+    <Project Path="src/Services/Notification/Notification.Persistence/Notification.Persistence.csproj" />
+    <Project Path="src/Services/Notification/Notification.Presentation/Notification.Presentation.csproj" />
+  </Folder>
+  <Folder Name="/src/Services/Procurement/">
+    <Project Path="src/Services/Procurement/Procurement.Domain/Procurement.Domain.csproj" />
+    <Project Path="src/Services/Procurement/Procurement.Application/Procurement.Application.csproj" />
+    <Project Path="src/Services/Procurement/Procurement.Infrastructure/Procurement.Infrastructure.csproj" />
+    <Project Path="src/Services/Procurement/Procurement.Persistence/Procurement.Persistence.csproj" />
+    <Project Path="src/Services/Procurement/Procurement.Presentation/Procurement.Presentation.csproj" />
+  </Folder>
+
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/ApiGateway/">
+    <Project Path="tests/ApiGateway/DDD.ApiGateway.Tests/DDD.ApiGateway.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Notification/">
+    <Project Path="tests/Notification/Notification.Domain.Tests/Notification.Domain.Tests.csproj" />
+    <Project Path="tests/Notification/Notification.Application.Tests/Notification.Application.Tests.csproj" />
+    <Project Path="tests/Notification/Notification.IntegrationTests/Notification.IntegrationTests.csproj" />
+    <Project Path="tests/Notification/Notification.ArchitectureTests/Notification.ArchitectureTests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Procurement/">
+    <Project Path="tests/Procurement/Procurement.Domain.Tests/Procurement.Domain.Tests.csproj" />
+    <Project Path="tests/Procurement/Procurement.Application.Tests/Procurement.Application.Tests.csproj" />
+    <Project Path="tests/Procurement/Procurement.IntegrationTests/Procurement.IntegrationTests.csproj" />
+    <Project Path="tests/Procurement/Procurement.ArchitectureTests/Procurement.ArchitectureTests.csproj" />
+  </Folder>
+</Solution>

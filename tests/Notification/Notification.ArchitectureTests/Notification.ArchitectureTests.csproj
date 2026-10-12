@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
+    <PackageReference Include="coverlet.collector" PrivateAssets="all" />
+    <PackageReference Include="FluentAssertions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Services\Notification\Notification.Domain\Notification.Domain.csproj" />
+    <ProjectReference Include="..\..\..\src\Services\Notification\Notification.Application\Notification.Application.csproj" />
+    <ProjectReference Include="..\..\..\src\Services\Notification\Notification.Infrastructure\Notification.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\src\Services\Notification\Notification.Persistence\Notification.Persistence.csproj" />
+    <ProjectReference Include="..\..\..\src\Services\Notification\Notification.Presentation\Notification.Presentation.csproj" />
+  </ItemGroup>
+
+</Project>
