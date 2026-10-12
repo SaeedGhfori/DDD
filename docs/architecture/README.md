@@ -61,15 +61,15 @@ src/Services/<Service>/
 - **Contracts:** `DDD.Contracts` is reserved for integration event contracts.
 - **Data ownership:** each service is expected to own its schema/database.
 
-## Domain modeling (Procurement)
+## Documentation index
 
-- [Ubiquitous Language](ubiquitous-language.md) — shared business vocabulary (v0.2).
-- [Domain Model v0.2](domain-model-v0.2.md) — scope, rules, scenarios, decisions,
-  assumptions and open questions.
-- [Chat 01 Final Review](chat-01-final-review.md) — architecture/test validation
-  and hand-off state for Chat 02.
-- [Chat 01 Audit Report](chat-01-audit-report.md) — evidence-based audit and
-  readiness decision.
+- [System Overview](system-overview.md) — context, components, boundaries, dependency direction.
+- [Current State](current-state.md) — verified implemented vs planned capabilities.
+- [Decisions (ADRs)](decisions/README.md) — canonical architecture decision records.
+- [Domain Model v0.2](domain-model-v0.2.md) — Procurement model detail.
+- [Chat 01 Final Review](chat-01-final-review.md) — architecture/test validation and Chat 02 hand-off.
+- [Chat 01 Audit Report](chat-01-audit-report.md) — evidence-based audit and readiness decision.
+- Domain knowledge: [Business Rules](../domain/business-rules.md), [Ubiquitous Language](../domain/ubiquitous-language.md).
 
 ## First use case — `CreatePurchaseRequest` (Procurement)
 
@@ -104,4 +104,5 @@ Not yet implemented for this flow:
 
 ## Open points
 
-See `docs/decisions` for architecture decisions and items still open.
+See [`docs/architecture/decisions/`](decisions/README.md) for accepted decisions
+and the list of still-open topics.

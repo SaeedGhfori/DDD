@@ -3,8 +3,8 @@
 Status: Final for Chat 01
 Solution file: **`DDD.slnx`** (the classic `DDD.sln` is not present; all commands
 below use `DDD.slnx`)
-Related: `docs/architecture/ubiquitous-language.md`,
-`docs/architecture/domain-model-v0.2.md`, `docs/decisions/README.md`
+Related: `docs/domain/ubiquitous-language.md`,
+`docs/architecture/domain-model-v0.2.md`, `docs/architecture/decisions/`
 
 This document reflects the **actual** state of the code, not an ideal one.
 
@@ -52,7 +52,7 @@ Warehouse, and all cross-service integration.
 **Temporary engineering decision (not a confirmed rule)**
 
 - TMP-1: Items may only be added in `Draft` or `ReturnedForCorrection`; editing
-  while `Submitted` is intentionally disabled (see ADR-010 and §10).
+  while `Submitted` is intentionally disabled (see ADR-0010 and §10).
 
 ## 4. Current Domain Model
 
@@ -81,7 +81,7 @@ by id.
 
 ## 5. Ubiquitous Language
 
-See `docs/architecture/ubiquitous-language.md`. Key distinctions:
+See `docs/domain/ubiquitous-language.md`. Key distinctions:
 
 - **Rejected** (terminal) vs **Returned for Correction** (revivable).
 - **Employee** (member) vs **Requester / Department Manager** (roles).

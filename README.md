@@ -3,121 +3,85 @@
 A learning-oriented .NET 10 solution built around **Domain-Driven Design (DDD)**,
 **Clean Architecture** and a **microservice-oriented** layout.
 
-This repository is developed iteratively as part of the training series:
-
 > Domain-Driven Design for Senior .NET / Enterprise Backend — 2026
 
-## Solution overview
+**Start here (for humans and AI agents):** [`AGENTS.md`](AGENTS.md) is the primary
+entry point for working in this repository.
 
-The solution contains two independent microservices and one API gateway:
+## Business purpose
 
-| Component      | Path                                   | Responsibility                                  |
-| -------------- | -------------------------------------- | ----------------------------------------------- |
-| `Procurement`  | `src/Services/Procurement`             | Purchase request capability                     |
-| `Notification` | `src/Services/Notification`            | Outbound notification capability                |
-| `DDD.ApiGateway` | `src/ApiGateway/DDD.ApiGateway`      | YARP reverse proxy in front of the services     |
+**Mini Procurement** — employees create purchase requests; a department manager
+approves, finally rejects, or returns them for correction. A returned request can
+be corrected and resubmitted.
 
-Shared communication contracts live in `src/BuildingBlocks/DDD.Contracts`.
-
-## Layers per service
-
-Each microservice is split into independent projects following Clean Architecture:
+## Repository structure
 
 ```
-Presentation  ──►  Application  ──►  Domain
-Infrastructure ──►  Application / Domain
-Persistence    ──►  Application / Domain
+src/
+  Services/Procurement/      Procurement microservice (Domain, Application, Infrastructure, Persistence, Presentation)
+  Services/Notification/     Notification microservice (scaffolding only)
+  ApiGateway/DDD.ApiGateway  YARP reverse proxy
+  BuildingBlocks/DDD.Contracts  Cross-service integration contracts (empty)
+tests/
+  Procurement/               Domain, Application, Architecture, Integration tests
+  Notification/              Empty test scaffolds
+  ApiGateway/                Empty test scaffold
+docs/
+  architecture/              system overview, current state, ADRs, model detail, reports
+  domain/                    business rules, ubiquitous language
+deploy/                      Docker assets (placeholders)
 ```
 
-- **Domain** — entities, value objects and domain rules. No external dependencies.
-- **Application** — use cases / orchestration. Depends on `Domain`.
-- **Infrastructure** — technical concerns (integrations, adapters).
-- **Persistence** — Entity Framework Core + PostgreSQL data access.
-- **Presentation** — ASP.NET Core Minimal API composition root.
-
-`Presentation` is the composition root and references the other layers through
-Dependency Injection.
+The solution file is **`DDD.slnx`** (there is no classic `DDD.sln`). It contains
+21 projects.
 
 ## Prerequisites
 
-- [.NET SDK 10.0.400](https://dotnet.microsoft.com/) (see `global.json`)
-- (Optional) PostgreSQL 16+ for future database work
+- [.NET SDK 10.0.400](https://dotnet.microsoft.com/) (pinned in `global.json`, `rollForward: latestMinor`)
+- (Optional) PostgreSQL 16+ for future persistence work
 - (Optional) Docker for the future `deploy` assets
 
-## Build & test
+## Restore, build, test
 
 ```powershell
 dotnet restore DDD.slnx
-dotnet build DDD.slnx -c Debug
-dotnet test DDD.slnx
+dotnet build   DDD.slnx -c Debug
+dotnet test    DDD.slnx
 ```
 
-Run a single service or the gateway:
+Run the Procurement service:
 
 ```powershell
 dotnet run --project src/Services/Procurement/Procurement.Presentation
-dotnet run --project src/Services/Notification/Notification.Presentation
-dotnet run --project src/ApiGateway/DDD.ApiGateway
+# POST http://localhost:5101/api/purchase-requests
 ```
 
-## First use case — `CreatePurchaseRequest`
+## Current implementation status (summary)
 
-`POST /api/purchase-requests` creates a new purchase request from the requester,
-department and approver identifiers.
+- **Implemented & verified:** Procurement domain model + rules, the
+  `CreatePurchaseRequest` use case (HTTP → Application → Domain), layered
+  dependency rules (architecture tests).
+- **Not implemented:** persistence (created requests are **not stored**),
+  remaining use cases/endpoints, approver resolution, Notification logic,
+  messaging, authentication, gateway operational integration.
 
-```powershell
-dotnet run --project src/Services/Procurement/Procurement.Presentation
-# http://localhost:5101/api/purchase-requests
-```
+Full, maintained detail: [`docs/architecture/current-state.md`](docs/architecture/current-state.md).
 
-```http
-POST /api/purchase-requests
-{
-  "requesterId": "11111111-1111-1111-1111-111111111111",
-  "departmentId": "22222222-2222-2222-2222-222222222222",
-  "approverId": "33333333-3333-3333-3333-333333333333"
-}
-```
+## Documentation
 
-Responses: `201 Created` on success, `400 Bad Request` for invalid input,
-`409 Conflict` for a domain rule violation.
+| Document | Purpose |
+| --- | --- |
+| [`AGENTS.md`](AGENTS.md) | Working instructions for AI coding agents |
+| [`docs/architecture/system-overview.md`](docs/architecture/system-overview.md) | Context, components, boundaries |
+| [`docs/architecture/current-state.md`](docs/architecture/current-state.md) | Implemented vs planned |
+| [`docs/architecture/decisions/`](docs/architecture/decisions/README.md) | Architecture Decision Records |
+| [`docs/domain/business-rules.md`](docs/domain/business-rules.md) | Canonical business rules |
+| [`docs/domain/ubiquitous-language.md`](docs/domain/ubiquitous-language.md) | Canonical vocabulary |
+| [`docs/architecture/domain-model-v0.2.md`](docs/architecture/domain-model-v0.2.md) | Procurement model detail |
+| [`docs/architecture/chat-01-audit-report.md`](docs/architecture/chat-01-audit-report.md) | Audit & readiness |
 
-> **No persistence yet.** The request is created in memory by the Domain and is
-> **not stored**. The endpoint exists only to exercise the HTTP → Application →
-> Domain path; nothing survives the process. `ApproverId` is a temporary input
-> until an organization service can resolve the requester's department manager.
+## Central package management
 
-## Central Package Management
-
-NuGet versions are managed centrally. **All** package versions are declared in
-`Directory.Packages.props`; individual `.csproj` files reference packages
-*wifhout* a `Version` attribute:
-
-```xml
-<PackageReference Include="Microsoft.EntityFrameworkCore" />
-```
-
-Common build properties (`TargetFramework`, `Nullable`, `ImplicitUsings`,
-`TreatWarningsAsErrors`) are defined once in `Directory.Build.props`.
-
-## Current status
-
-Implemented in the current iteration:
-
-- Full solution / project skeleton with layer boundaries.
-- Shared build & package configuration, `.editorconfig`, `.gitignore`, `global.json`.
-- Initial `Procurement` domain model (`PurchaseRequest`, `PurchaseRequestItem`).
-- First application use case `CreatePurchaseRequest` (Application + Minimal API endpoint).
-- Minimal API entry points and a YARP-based API gateway reading routes from configuration.
-- Domain unit tests for `PurchaseRequest`, application tests for the use case,
-  layered-architecture tests and an initial HTTP integration test for the create endpoint.
-
-Not implemented yet (planned for later iterations):
-
-- Persistence: the create endpoint does not store data (EF Core `DbContext`,
-  model configuration and migrations are still pending).
-- Remaining business endpoints (submit/approve/reject/return) for Procurement.
-- Notification business endpoints and messaging / integration events (`DDD.Contracts`).
-- Authentication, Docker, observability, resilience policies.
-
-See `docs/architecture` and `docs/decisions` for details.
+All package versions are declared centrally in `Directory.Packages.props`;
+`PackageReference` entries in `.csproj` files have **no** `Version` attribute.
+Shared build properties live in `Directory.Build.props`.

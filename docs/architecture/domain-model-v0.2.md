@@ -1,7 +1,7 @@
 # Domain Model v0.2 — Procurement (Mini Procurement)
 
 Status: Draft (Chat 01)
-Related: `docs/architecture/ubiquitous-language.md`, `docs/decisions/README.md`
+Related: `docs/domain/ubiquitous-language.md`, `docs/architecture/decisions/`
 
 This document captures the knowledge-crunching outcome for the first slice of
 the `Procurement` domain: what is **confirmed**, what is a **temporary
@@ -48,7 +48,7 @@ Warehouse, and any cross-service integration.
 
 - TMP-1: Items can only be added while the request is in `Draft` or
   `ReturnedForCorrection`. Editing while `Submitted` is intentionally disabled.
-  See §7 and `docs/decisions/README.md` (ADR-010).
+  See §7 and `docs/architecture/decisions/adr-0010-temporary-item-editing-restriction.md`.
 
 ### Hypotheses — NOT rules
 
@@ -111,7 +111,7 @@ PurchaseRequestStatus
 
 ## 4. Ubiquitous Language
 
-The full glossary lives in `docs/architecture/ubiquitous-language.md`. Key
+The full glossary lives in `docs/domain/ubiquitous-language.md`. Key
 distinctions:
 
 - **Rejected** (terminal) vs **Returned for Correction** (revivable).

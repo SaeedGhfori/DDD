@@ -20,17 +20,17 @@
 | Requirement | Status | Evidence | Remaining Work |
 | --- | --- | --- | --- |
 | **§2A** توضیح مسئله کسب‌وکار Mini Procurement | PASS | `docs/architecture/domain-model-v0.2.md` §1، §2؛ `README.md` | — |
-| **§2A** شناسایی Actorها و مسئولیت‌ها | PASS | `ubiquitous-language.md` (Employee/Requester/Department Manager)؛ `domain-model-v0.2.md` §5 | — |
+| **§2A** شناسایی Actorها و مسئولیت‌ها | PASS | `docs/domain/ubiquitous-language.md` (Employee/Requester/Department Manager)؛ `domain-model-v0.2.md` §5 | — |
 | **§2A** مستند چرخه‌عمر Purchase Request | PASS | `domain-model-v0.2.md` §3، §5؛ `chat-01-final-review.md` §6 | — |
 | **§2A** قواعد کسب‌وکار صریح و قابل‌ردیابی | PASS | `BR-1..BR-13` در `domain-model-v0.2.md` §2 | — |
-| **§2A** تفکیک تصمیم تأییدشده از فرض و سؤال باز | PASS | `domain-model-v0.2.md` §6/§7/§8؛ `docs/decisions/README.md` (ADR-010) | — |
+| **§2A** تفکیک تصمیم تأییدشده از فرض و سؤال باز | PASS | `domain-model-v0.2.md` §6/§7/§8؛ `docs/architecture/decisions/` (ADR-0010) | — |
 | **§2A** مدل مبتنی بر دانش کسب‌وکار، نه CRUD | PASS | Domain بدون CRUD؛ رفتارهای کنترل‌شده (`Submit/Approve/Reject/Return`/`AddItem`) | — |
 | **§2B** مستند فرایند کشف/پالایش قواعد | PASS | `domain-model-v0.2.md` §2/§5/§9 | نیاز به «Knowledge Crunching» صریح‌تر در نگارش (اختیاری) |
 | **§2B** ثبت پرسش‌های مهم و پاسخ فعلی | PASS | `domain-model-v0.2.md` §8 (۸ پرسش باز) | پاسخ‌ها باید در Chat 02 از کسب‌وکار گرفته شود |
-| **§2B** ذکر صریح تصمیم‌های حل‌نشده | PASS | §8 + ADR-010 | — |
+| **§2B** ذکر صریح تصمیم‌های حل‌نشده | PASS | §8 + ADR-0010 | — |
 | **§2B** عدم ارائه فرض به‌عنوان قاعده تأییدشده | PASS | بخش «Temporary» و «Hypotheses — NOT rules» در §2 | — |
 | **§2B** همکاری واقعی با Domain Expert | PARTIAL | هیچ شواهدی از جلسه واقعی با خبره کسب‌وکار در Workspace نیست؛ محتوا از دامنهٔ Promptها استخراج شده | باید این محدودیت در Chat 02 اعلام شود |
-| **§2C** یکدستی معنای اصطلاحات در کد و مستندات | PASS | `ubiquitous-language.md`؛ نام‌ها در `PurchaseRequest*` و enum | — |
+| **§2C** یکدستی معنای اصطلاحات در کد و مستندات | PASS | `docs/domain/ubiquitous-language.md`؛ نام‌ها در `PurchaseRequest*` و enum | — |
 | **§2C** تفکیک معنایی Rejected و ReturnedForCorrection | PASS | enum + `PurchaseRequestTests` (`..._can_be_returned_for_correction`, `..._can_be_rejected`, final-state test) | — |
 | **§2D** سازگاری مدل مفهومی و پیاده‌سازی C# | PASS | `domain-model-v0.2.md` §3/§9 در برابر `PurchaseRequest.cs` | — |
 | **§2D** پیاده‌سازی عملیات (create/item/submit/approve/reject/return/resubmit) | PASS | `PurchaseRequest.cs`, `PurchaseRequestItem.cs` | — |
@@ -66,7 +66,7 @@
 | **§5** ارسال مجدد پس از اصلاح | PASS | `Returned_request_can_be_corrected_and_resubmitted` | — |
 | **§5** Rejected به‌عنوان نتیجه نهایی | PASS | `Final_status_cannot_be_changed` | — |
 | **§5** مجاز بودن Self-approval | PASS | `Self_approval_is_allowed_when_approver_is_the_requester` (تست افزوده‌شده در همین ممیزی) | — |
-| **§5** ابهام باز ویرایش در Submitted | PASS | ADR-010 + `Items_cannot_be_added_once_submitted` | حل در Chat 02 |
+| **§5** ابهام باز ویرایش در Submitted | PASS | ADR-0010 + `Items_cannot_be_added_once_submitted` | حل در Chat 02 |
 | **§5** عدم ادعای تأیید Approver به‌عنوان مدیر واقعی | PASS | `README.md`, `domain-model-v0.2.md` §7، `chat-01-final-review.md` §11 | — |
 | **§6** پوشش Invariantهای Domain | PASS | `Procurement.Domain.Tests` (28) | — |
 | **§6** انتقال معتبر | PASS | approve/return/reject/resubmit | — |
@@ -88,7 +88,7 @@
 | **§7** `DDD.Contracts` | PASS | خالی و فقط برای Integration Contract | — |
 | **§7** پروژه‌های تست | PARTIAL | Procurement پر؛ `Notification.*` و `DDD.ApiGateway.Tests` خالی (اسکافولد) | تکمیل در مراحل بعد |
 | **§7** مستندات معماری | PASS | `docs/architecture/*` | — |
-| **§7** مستندات تصمیم (ADR) | PASS | `docs/decisions/README.md` (ADR-010) | — |
+| **§7** مستندات تصمیم (ADR) | PASS | `docs/architecture/decisions/` (ADR-0010) | — |
 | **§7** READMEها | PASS | `README.md`, `docs/architecture/README.md`, `deploy/README.md` | — |
 | **§7** `.editorconfig` / `.gitignore` / `global.json` | PASS | هر سه موجود | `.gitattributes` نیز موجود |
 | **§7** سازگاری CPM/TFM/مراجع/پکیج | PASS | net10.0 یکدست؛ restore/build موفق | — |
@@ -106,7 +106,7 @@
 - **قواعد پیاده‌شده:** BR-1..BR-13 (شناسه‌های غیرتهی، `Draft` اولیه، حداقل یک قلم برای Submit، اعتبار شرح/تعداد، تصمیم فقط در `Submitted`، تفکیک `ReturnedForCorrection`/`Rejected`، ارسال مجدد، پایانی بودن `Approved`/`Rejected`، self-approval).
 - **انتقال‌های تأییدشده:** `Draft→Submitted`، `ReturnedForCorrection→Submitted`، `Submitted→{Approved|ReturnedForCorrection|Rejected}`؛ وضعیت‌های پایانی تغییرناپذیر.
 - **سازگاری مستند/کد:** `domain-model-v0.2.md` §9 نگاشت مفهوم↔پیاده‌سازی را ارائه می‌دهد و با کد همراستاست.
-- **فرض‌ها و سؤال‌های باز:** ویرایش در `Submitted` (موقت، ADR-010)، منبع Approver، self-approval دائمی؟، متادیتای تصمیم، احیای `Rejected`، حذف/ویرایش اقلام، مالکیت Employee/Department.
+- **فرض‌ها و سؤال‌های باز:** ویرایش در `Submitted` (موقت، ADR-0010)، منبع Approver، self-approval دائمی؟، متادیتای تصمیم، احیای `Rejected`، حذف/ویرایش اقلام، مالکیت Employee/Department.
 
 ## E. نتایج تست و Build
 
