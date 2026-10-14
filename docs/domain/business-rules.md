@@ -23,25 +23,28 @@ Do not silently change a rule. When the code and a rule conflict, report it (see
 | BR-04 | Item description must be non-empty (trimmed). | Confirmed | item docs | `PurchaseRequestItem` ctor | `Description_must_not_be_empty_or_whitespace`, `Description_is_trimmed_when_valid` |
 | BR-05 | Item quantity must be greater than zero. | Confirmed | item docs | `PurchaseRequestItem` ctor | `Quantity_must_be_greater_than_zero` |
 | BR-06 | The initial request status is `Draft`. | Confirmed | model docs | `PurchaseRequest` ctor | `New_request_starts_in_draft_without_items` |
-| BR-07 | The requester's department manager makes the approval decision. | Confirmed | model docs | **Not enforced** — `ApproverId` is supplied by the caller | — |
-| BR-08 | Self-approval is currently allowed. | Confirmed | model docs | no guard on requester vs approver | `Self_approval_is_allowed_when_approver_is_the_requester` |
+| BR-07 | The requester's department manager makes the approval decision. | Confirmed | model docs | `PurchaseRequest.Approve/Reject/ReturnForCorrection` — enforces `actorId == ApproverId`; manager identity resolution is still external (BR-14) | `Decision_by_non_approver_is_rejected` |
+| BR-08 | Self-approval is currently allowed. | Confirmed | model docs | enforced — `actorId == ApproverId` check permits it when `RequesterId == ApproverId` | `Self_approval_is_allowed_when_approver_is_the_requester` |
 | BR-09 | `ReturnedForCorrection` is different from final `Rejected`. | Confirmed | model docs | `PurchaseRequestStatus` enum; distinct methods | `Submitted_request_can_be_returned_for_correction`, `Submitted_request_can_be_rejected` |
 | BR-10 | A returned request can be corrected and resubmitted. | Confirmed | model docs | `AddItem` + `Submit` from `ReturnedForCorrection` | `Returned_request_can_be_corrected_and_resubmitted` |
 | BR-11 | `Approved` and `Rejected` are final states. | Confirmed | model docs | transition guards | `Final_status_cannot_be_changed` |
 | BR-12 | Only a `Submitted` request can receive a manager decision. | Confirmed | model docs | `EnsureSubmitted()` | `Decision_is_rejected_when_request_is_not_submitted` |
-| BR-13 | Editing behaviour while a request is `Submitted` is not yet decided. | Open Question | ADR-0010 | temporary restriction (editing only in `Draft`/`ReturnedForCorrection`) | `Items_cannot_be_added_once_submitted` |
-| BR-14 | The approver is assumed to be the department manager; verification is not implemented. | Assumption | README/current-state | **Not implemented** | — |
+| BR-13 | Editing is permitted only in `Draft` and `ReturnedForCorrection`; `Submitted` is locked; `Approved`/`Rejected` are final. | Confirmed | Business decision (Chat 02 resolution) | `PurchaseRequest.AddItem` status guard | `Items_cannot_be_added_once_submitted`, `Final_status_cannot_be_changed` |
+| BR-14 | The approver is assumed to be the department manager; verification is not implemented. | Assumption | README/current-state | **Not implemented** — manager identity resolution is external to this context | — |
 
 ## Open questions (must be answered by the business)
 
-1. Editing while `Submitted`: allowed? what may change? does it reset status?
-2. Must corrections be audited (who / when / what)?
-3. How is the approver resolved from organization data (and can it be overridden)?
-4. Is self-approval permanent or a temporary convenience?
-5. Should decisions carry a reason/comment and timestamp?
-6. Can a `Rejected` request ever be revived?
-7. Can items be removed/edited, or only appended?
-8. Which context owns `Employee` / `Department`, and how are they referenced?
+1. Must corrections be audited (who / when / what)?
+2. How is the approver resolved from organization data (and can it be overridden)?
+3. Is self-approval permanent or a temporary convenience?
+4. Should decisions carry a reason/comment and timestamp?
+5. Can a `Rejected` request ever be revived?
+6. Can items be removed/edited, or only appended?
+7. Which context owns `Employee` / `Department`, and how are they referenced?
+
+Resolved in Chat 02:
+- Editing while `Submitted` (formerly open question 1): modifications permitted only in `Draft` and `ReturnedForCorrection` (BR-13).
+- Approver authorization (formerly part of BR-07/BR-08 clarification): only the assigned `ApproverId` may decide; self-approval is permitted when `RequesterId == ApproverId`.
 
 ## Explicitly out of scope
 

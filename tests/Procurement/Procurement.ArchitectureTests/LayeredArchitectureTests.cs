@@ -1,7 +1,7 @@
 using System.Reflection;
 using FluentAssertions;
 using Procurement.Application.PurchaseRequests.Create;
-using Procurement.Domain.PurchaseRequests;
+using Procurement.Domain.PurchaseRequests.Aggregates;
 using Xunit;
 
 namespace Procurement.ArchitectureTests;

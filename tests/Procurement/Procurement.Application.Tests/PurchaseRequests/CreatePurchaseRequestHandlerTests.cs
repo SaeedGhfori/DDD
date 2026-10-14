@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Procurement.Application.PurchaseRequests.Create;
-using Procurement.Domain.PurchaseRequests;
+using Procurement.Domain.PurchaseRequests.Enums;
 using Xunit;
 
 namespace Procurement.Application.Tests.PurchaseRequests;

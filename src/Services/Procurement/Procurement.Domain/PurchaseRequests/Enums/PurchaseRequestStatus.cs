@@ -1,4 +1,4 @@
-namespace Procurement.Domain.PurchaseRequests;
+namespace Procurement.Domain.PurchaseRequests.Enums;
 
 public enum PurchaseRequestStatus
 {

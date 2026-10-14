@@ -17,7 +17,7 @@ Solution file: `DDD.slnx` (21 projects). SDK `10.0.400`, target `net10.0`.
 
 | Project | State |
 | --- | --- |
-| `Procurement.Domain` | Implemented & verified (`PurchaseRequest`, `PurchaseRequestItem`, `PurchaseRequestStatus`) |
+| `Procurement.Domain` | Implemented & verified (`PurchaseRequest` aggregate, VOs `PurchaseRequestId`, `PurchaseRequestItemId`, `Quantity`, equality, `Create/Reconstitute`, `IPurchaseRequestRepository` interface) |
 | `Procurement.Application` | Implemented & verified (`CreatePurchaseRequestHandler` + Command/Result) |
 | `Procurement.Presentation` | Implemented & verified (`POST /api/purchase-requests`, health, root) |
 | `Procurement.Infrastructure` | Planned — empty scaffold |
@@ -53,17 +53,17 @@ with `status = "Draft"`.
 
 | Project | Category | Tests |
 | --- | --- | --- |
-| `Procurement.Domain.Tests` | Unit | 28 |
+| `Procurement.Domain.Tests` | Unit | 36 |
 | `Procurement.Application.Tests` | Unit | 7 |
 | `Procurement.ArchitectureTests` | Architecture | 2 |
-| `Procurement.IntegrationTests` | Integration | 2 |
+| `Procurement.IntegrationTests` | Integration | 4 |
 | `Notification.Application.Tests` | — | Empty scaffold |
 | `Notification.ArchitectureTests` | — | Empty scaffold |
 | `Notification.Domain.Tests` | — | Empty scaffold |
 | `Notification.IntegrationTests` | — | Empty scaffold |
 | `DDD.ApiGateway.Tests` | — | Empty scaffold |
 
-Total executed: **39 passing** (last verified run — see "Build & test
+Total executed: **49 passing** (last verified run — see "Build & test
 verification" below). Test counts are the number of executed test cases; this is
 **not** a coverage measurement.
 
@@ -90,7 +90,7 @@ dotnet test    DDD.slnx
 ```
 
 Last observed result: restore succeeded, build succeeded with 0 warnings and 0
-errors, tests: 39 passed / 0 failed / 0 skipped.
+errors, tests: 49 passed / 0 failed / 0 skipped.
 
 > `dotnet build DDD.sln` fails with `MSB1009` because only `DDD.slnx` exists.
 > Always use `DDD.slnx`.

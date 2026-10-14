@@ -12,10 +12,12 @@
     <PackageReference Include="coverlet.collector" PrivateAssets="all" />
     <PackageReference Include="FluentAssertions" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Services\Procurement\Procurement.Presentation\Procurement.Presentation.csproj" />
+    <ProjectReference Include="..\..\..\src\Services\Procurement\Procurement.Persistence\Procurement.Persistence.csproj" />
   </ItemGroup>
 
 </Project>

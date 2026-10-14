@@ -1,5 +1,8 @@
 using FluentAssertions;
-using Procurement.Domain.PurchaseRequests;
+using Procurement.Domain.PurchaseRequests.Aggregates;
+using Procurement.Domain.PurchaseRequests.Entities;
+using Procurement.Domain.PurchaseRequests.Enums;
+using Procurement.Domain.PurchaseRequests.ValueObjects;
 using Xunit;
 
 namespace Procurement.Domain.Tests.PurchaseRequests;
@@ -11,6 +14,7 @@ public sealed class PurchaseRequestTests
     {
         var request = CreateDraft();
 
+        request.Id.Value.Should().NotBeEmpty();
         request.Status.Should().Be(PurchaseRequestStatus.Draft);
         request.Items.Should().BeEmpty();
     }
@@ -18,7 +22,7 @@ public sealed class PurchaseRequestTests
     [Fact]
     public void Requester_id_must_not_be_empty()
     {
-        var act = () => new PurchaseRequest(Guid.NewGuid(), Guid.Empty, Guid.NewGuid(), Guid.NewGuid());
+        var act = () => PurchaseRequest.Create(Guid.Empty, Guid.NewGuid(), Guid.NewGuid());
 
         act.Should().Throw<ArgumentException>();
     }
@@ -26,7 +30,7 @@ public sealed class PurchaseRequestTests
     [Fact]
     public void Department_id_must_not_be_empty()
     {
-        var act = () => new PurchaseRequest(Guid.NewGuid(), Guid.NewGuid(), Guid.Empty, Guid.NewGuid());
+        var act = () => PurchaseRequest.Create(Guid.NewGuid(), Guid.Empty, Guid.NewGuid());
 
         act.Should().Throw<ArgumentException>();
     }
@@ -34,7 +38,7 @@ public sealed class PurchaseRequestTests
     [Fact]
     public void Approver_id_must_not_be_empty()
     {
-        var act = () => new PurchaseRequest(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.Empty);
+        var act = () => PurchaseRequest.Create(Guid.NewGuid(), Guid.NewGuid(), Guid.Empty);
 
         act.Should().Throw<ArgumentException>();
     }
@@ -44,9 +48,9 @@ public sealed class PurchaseRequestTests
     {
         var request = CreateDraft();
 
-        request.AddItem(CreateItem());
+        var item = request.AddItem("Laptop", Quantity.From(1));
 
-        request.Items.Should().ContainSingle();
+        request.Items.Should().ContainSingle().Which.Should().Be(item);
         request.Status.Should().Be(PurchaseRequestStatus.Draft);
     }
 
@@ -65,7 +69,7 @@ public sealed class PurchaseRequestTests
     public void Submit_with_at_least_one_item_succeeds()
     {
         var request = CreateDraft();
-        request.AddItem(CreateItem());
+        request.AddItem("Laptop", Quantity.From(1));
 
         request.Submit();
 
@@ -77,7 +81,7 @@ public sealed class PurchaseRequestTests
     {
         var request = CreateSubmitted();
 
-        request.Approve();
+        request.Approve(request.ApproverId);
 
         request.Status.Should().Be(PurchaseRequestStatus.Approved);
     }
@@ -87,7 +91,7 @@ public sealed class PurchaseRequestTests
     {
         var request = CreateSubmitted();
 
-        request.ReturnForCorrection();
+        request.ReturnForCorrection(request.ApproverId);
 
         request.Status.Should().Be(PurchaseRequestStatus.ReturnedForCorrection);
     }
@@ -97,7 +101,7 @@ public sealed class PurchaseRequestTests
     {
         var request = CreateSubmitted();
 
-        request.Reject();
+        request.Reject(request.ApproverId);
 
         request.Status.Should().Be(PurchaseRequestStatus.Rejected);
     }
@@ -106,9 +110,9 @@ public sealed class PurchaseRequestTests
     public void Returned_request_can_be_corrected_and_resubmitted()
     {
         var request = CreateSubmitted();
-        request.ReturnForCorrection();
+        request.ReturnForCorrection(request.ApproverId);
 
-        request.AddItem(CreateItem("Monitor"));
+        request.AddItem("Monitor", Quantity.From(1));
         request.Submit();
 
         request.Status.Should().Be(PurchaseRequestStatus.Submitted);
@@ -123,7 +127,7 @@ public sealed class PurchaseRequestTests
     {
         var request = CreateDraft();
 
-        var act = () => Invoke(request, operation);
+        var act = () => Invoke(request, operation, request.ApproverId);
 
         act.Should().Throw<InvalidOperationException>();
         request.Status.Should().Be(PurchaseRequestStatus.Draft);
@@ -134,7 +138,7 @@ public sealed class PurchaseRequestTests
     {
         var request = CreateSubmitted();
 
-        var act = () => request.AddItem(CreateItem());
+        var act = () => request.AddItem("Laptop", Quantity.From(1));
 
         act.Should().Throw<InvalidOperationException>();
         request.Items.Should().ContainSingle();
@@ -145,18 +149,17 @@ public sealed class PurchaseRequestTests
     [InlineData(nameof(PurchaseRequest.Approve))]
     [InlineData(nameof(PurchaseRequest.ReturnForCorrection))]
     [InlineData(nameof(PurchaseRequest.Reject))]
-    [InlineData(nameof(PurchaseRequest.AddItem))]
     public void Final_status_cannot_be_changed(string operation)
     {
         var approved = CreateSubmitted();
-        approved.Approve();
-        var approveAct = () => Invoke(approved, operation);
+        approved.Approve(approved.ApproverId);
+        var approveAct = () => Invoke(approved, operation, approved.ApproverId);
         approveAct.Should().Throw<InvalidOperationException>();
         approved.Status.Should().Be(PurchaseRequestStatus.Approved);
 
         var rejected = CreateSubmitted();
-        rejected.Reject();
-        var rejectAct = () => Invoke(rejected, operation);
+        rejected.Reject(rejected.ApproverId);
+        var rejectAct = () => Invoke(rejected, operation, rejected.ApproverId);
         rejectAct.Should().Throw<InvalidOperationException>();
         rejected.Status.Should().Be(PurchaseRequestStatus.Rejected);
     }
@@ -165,22 +168,36 @@ public sealed class PurchaseRequestTests
     public void Self_approval_is_allowed_when_approver_is_the_requester()
     {
         var employeeId = Guid.NewGuid();
-        var request = new PurchaseRequest(Guid.NewGuid(), employeeId, Guid.NewGuid(), employeeId);
-        request.AddItem(CreateItem());
+        var request = PurchaseRequest.Create(employeeId, Guid.NewGuid(), employeeId);
+        request.AddItem("Laptop", Quantity.From(1));
         request.Submit();
 
-        request.Approve();
+        request.Approve(employeeId);
 
         request.Status.Should().Be(PurchaseRequestStatus.Approved);
+    }
+
+    [Theory]
+    [InlineData(nameof(PurchaseRequest.Approve))]
+    [InlineData(nameof(PurchaseRequest.ReturnForCorrection))]
+    [InlineData(nameof(PurchaseRequest.Reject))]
+    public void Decision_by_non_approver_is_rejected(string operation)
+    {
+        var request = CreateSubmitted();
+
+        var act = () => Invoke(request, operation, Guid.NewGuid());
+
+        act.Should().Throw<UnauthorizedAccessException>();
+        request.Status.Should().Be(PurchaseRequestStatus.Submitted);
     }
 
     [Fact]
     public void First_scenario_create_add_two_items_and_submit()
     {
-        var request = new PurchaseRequest(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
+        var request = PurchaseRequest.Create(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
 
-        request.AddItem(new PurchaseRequestItem(Guid.NewGuid(), "Laptop", 1));
-        request.AddItem(new PurchaseRequestItem(Guid.NewGuid(), "Docking station", 2));
+        request.AddItem("Laptop", Quantity.From(1));
+        request.AddItem("Docking station", Quantity.From(2));
 
         request.Submit();
 
@@ -188,21 +205,45 @@ public sealed class PurchaseRequestTests
         request.Items.Should().HaveCount(2);
     }
 
+    [Fact]
+    public void Requests_with_the_same_id_are_equal()
+    {
+        var id = PurchaseRequestId.New();
+        var first = PurchaseRequest.Reconstitute(
+            id, Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), PurchaseRequestStatus.Draft, []);
+        var second = PurchaseRequest.Reconstitute(
+            id, Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), PurchaseRequestStatus.Approved, []);
+
+        first.Should().Be(second);
+        first.GetHashCode().Should().Be(second.GetHashCode());
+    }
+
+    [Fact]
+    public void Reconstitute_restores_status_and_items()
+    {
+        var item = new PurchaseRequestItem(PurchaseRequestItemId.New(), "Laptop", Quantity.From(3));
+        var id = PurchaseRequestId.New();
+
+        var request = PurchaseRequest.Reconstitute(
+            id, Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), PurchaseRequestStatus.Submitted, [item]);
+
+        request.Id.Should().Be(id);
+        request.Status.Should().Be(PurchaseRequestStatus.Submitted);
+        request.Items.Should().ContainSingle().Which.Should().Be(item);
+    }
+
     private static PurchaseRequest CreateDraft() =>
-        new(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
+        PurchaseRequest.Create(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
 
     private static PurchaseRequest CreateSubmitted()
     {
         var request = CreateDraft();
-        request.AddItem(CreateItem());
+        request.AddItem("Laptop", Quantity.From(1));
         request.Submit();
         return request;
     }
 
-    private static PurchaseRequestItem CreateItem(string description = "Laptop") =>
-        new(Guid.NewGuid(), description, 1);
-
-    private static void Invoke(PurchaseRequest request, string operation)
+    private static void Invoke(PurchaseRequest request, string operation, Guid actorId)
     {
         switch (operation)
         {
@@ -210,16 +251,13 @@ public sealed class PurchaseRequestTests
                 request.Submit();
                 break;
             case nameof(PurchaseRequest.Approve):
-                request.Approve();
+                request.Approve(actorId);
                 break;
             case nameof(PurchaseRequest.ReturnForCorrection):
-                request.ReturnForCorrection();
+                request.ReturnForCorrection(actorId);
                 break;
             case nameof(PurchaseRequest.Reject):
-                request.Reject();
-                break;
-            case nameof(PurchaseRequest.AddItem):
-                request.AddItem(CreateItem());
+                request.Reject(actorId);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(operation), operation, "Unknown operation.");

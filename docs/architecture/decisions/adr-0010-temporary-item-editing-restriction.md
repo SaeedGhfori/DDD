@@ -29,6 +29,13 @@ rather than guessed.
 - The code does not encode an unconfirmed business decision.
 - Until the open question is answered, submitted requests are locked for edits.
 
+## Update (Chat 02 resolution)
+
+The business owner has since **resolved** this question (BR-13): modifications
+are permitted only in `Draft` and `ReturnedForCorrection`; `Submitted` is locked.
+This ADR remains valid as the implementation record. See BR-13 in
+`docs/domain/business-rules.md`.
+
 ## Related documents or code
 
 - `src/Services/Procurement/Procurement.Domain/PurchaseRequests/PurchaseRequest.cs`

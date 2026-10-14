@@ -1,4 +1,4 @@
-using Procurement.Domain.PurchaseRequests;
+using Procurement.Domain.PurchaseRequests.Aggregates;
 
 namespace Procurement.Application.PurchaseRequests.Create;
 
@@ -8,12 +8,11 @@ public sealed class CreatePurchaseRequestHandler
     {
         ArgumentNullException.ThrowIfNull(command);
 
-        var purchaseRequest = new PurchaseRequest(
-            Guid.NewGuid(),
+        var purchaseRequest = PurchaseRequest.Create(
             command.RequesterId,
             command.DepartmentId,
             command.ApproverId);
 
-        return new CreatePurchaseRequestResult(purchaseRequest.Id, purchaseRequest.Status);
+        return new CreatePurchaseRequestResult(purchaseRequest.Id.Value, purchaseRequest.Status);
     }
 }

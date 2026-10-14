@@ -1,4 +1,4 @@
-using Procurement.Domain.PurchaseRequests;
+using Procurement.Domain.PurchaseRequests.Enums;
 
 namespace Procurement.Application.PurchaseRequests.Create;
 

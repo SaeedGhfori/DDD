@@ -16,6 +16,7 @@ Canonical location for architecture decisions in this repository.
 | [ADR-0008](adr-0008-postgresql-target-store.md) | PostgreSQL as the target relational store | Accepted |
 | [ADR-0009](adr-0009-strict-compiler-settings.md) | Warnings as errors, nullable + implicit usings | Accepted |
 | [ADR-0010](adr-0010-temporary-item-editing-restriction.md) | Temporary: item editing only in `Draft`/`ReturnedForCorrection` | Accepted (temporary) |
+| [ADR-0011](adr-0011-repository-per-aggregate.md) | Repository per aggregate root with EF Core mapping (Procurement) | Accepted |
 
 ## Open (no ADR yet — decide before implementing)
 
