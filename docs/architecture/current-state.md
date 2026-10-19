@@ -17,11 +17,11 @@ Solution file: `DDD.slnx` (21 projects). SDK `10.0.400`, target `net10.0`.
 
 | Project | State |
 | --- | --- |
-| `Procurement.Domain` | Implemented & verified (`PurchaseRequest` aggregate, VOs `PurchaseRequestId`, `PurchaseRequestItemId`, `Quantity`, equality, `Create/Reconstitute`, `IPurchaseRequestRepository` interface) |
+| `Procurement.Domain` | Implemented & verified (`PurchaseRequest` aggregate, VOs `PurchaseRequestId`, `PurchaseRequestItemId`, `Quantity`, equality, `Create/Reconstitute`, `IPurchaseRequestRepository`; decision methods enforce `actorId == ApproverId`) |
 | `Procurement.Application` | Implemented & verified (`CreatePurchaseRequestHandler` + Command/Result) |
 | `Procurement.Presentation` | Implemented & verified (`POST /api/purchase-requests`, health, root) |
 | `Procurement.Infrastructure` | Planned — empty scaffold |
-| `Procurement.Persistence` | Planned — scaffold references EF Core + Npgsql, no code |
+| `Procurement.Persistence` | Implemented, not verified against a real database (`ProcurementDbContext`, `PurchaseRequestConfiguration`, `PurchaseRequestRepository`; EF Core InMemory tested only) |
 | `Notification.*` (5 projects) | Planned — empty scaffolds; only `Program.cs` (health + root) |
 | `DDD.ApiGateway` | Implemented, not verified — YARP routes configured to ports 5101/5102 |
 | `DDD.Contracts` | Not implemented — empty (reserved for integration contracts) |
@@ -40,10 +40,12 @@ with `status = "Draft"`.
 
 ## Implemented domain models
 
-- `PurchaseRequest` — aggregate-root candidate: `Id`, `RequesterId`,
-  `DepartmentId`, `ApproverId` (non-empty), `Status` (starts `Draft`), `Items`
-  (read-only), and behaviour `AddItem`, `Submit`, `Approve`,
-  `ReturnForCorrection`, `Reject`.
+- `PurchaseRequest` — aggregate root: `Id`, `RequesterId`, `DepartmentId`,
+  `ApproverId` (non-empty), `Status` (starts `Draft`), `Items` (read-only),
+  factory `Create` / `Reconstitute`, and behaviour `AddItem`, `Submit`,
+  `Approve(actorId)`, `ReturnForCorrection(actorId)`, `Reject(actorId)`.
+  Decision methods require the actor to equal `ApproverId` (self-approval
+  permitted when `RequesterId == ApproverId`).
 - `PurchaseRequestItem` — `Id` (non-empty), `Description` (trimmed, non-empty),
   `Quantity` (> 0).
 - `PurchaseRequestStatus` — `Draft`, `Submitted`, `ReturnedForCorrection`,
@@ -53,7 +55,7 @@ with `status = "Draft"`.
 
 | Project | Category | Tests |
 | --- | --- | --- |
-| `Procurement.Domain.Tests` | Unit | 36 |
+| `Procurement.Domain.Tests` | Unit | 39 |
 | `Procurement.Application.Tests` | Unit | 7 |
 | `Procurement.ArchitectureTests` | Architecture | 2 |
 | `Procurement.IntegrationTests` | Integration | 4 |
@@ -63,7 +65,7 @@ with `status = "Draft"`.
 | `Notification.IntegrationTests` | — | Empty scaffold |
 | `DDD.ApiGateway.Tests` | — | Empty scaffold |
 
-Total executed: **49 passing** (last verified run — see "Build & test
+Total executed: **52 passing** (last verified run — see "Build & test
 verification" below). Test counts are the number of executed test cases; this is
 **not** a coverage measurement.
 
@@ -71,7 +73,7 @@ verification" below). Test counts are the number of executed test cases; this is
 
 | Feature | State |
 | --- | --- |
-| Persistence | **Not implemented** — the create endpoint does not store data |
+| Persistence | **Partially implemented** — EF Core mapping + repository exist; the create endpoint still does not store data; only the InMemory provider has been tested |
 | Messaging / integration events | **Not implemented** |
 | Gateway operational integration | **Not verified** — routes configured only |
 | Notification business logic | **Not implemented** |
@@ -90,18 +92,22 @@ dotnet test    DDD.slnx
 ```
 
 Last observed result: restore succeeded, build succeeded with 0 warnings and 0
-errors, tests: 49 passed / 0 failed / 0 skipped.
+errors, tests: 52 passed / 0 failed / 0 skipped.
 
 > `dotnet build DDD.sln` fails with `MSB1009` because only `DDD.slnx` exists.
 > Always use `DDD.slnx`.
 
 ## Known limitations
 
-- No persistence; created requests are not stored.
+- Persistence exists (EF Core mapping + repository) but is **not wired** into the
+  create endpoint; created requests are still not stored.
+- EF mapping has only been exercised with the InMemory provider; PostgreSQL is
+  not verified.
 - Only one use case (`CreatePurchaseRequest`); no submit/decision endpoints.
-- `ApproverId` is not validated as the real department manager.
-- `Notification`, `Infrastructure`, `Persistence` are empty scaffolds.
-- No auth, no messaging, no gateway operational verification.
+- `ApproverId` is not validated as the real department manager (the domain only
+  checks that the deciding actor matches `ApproverId`).
+- `Notification` and `Infrastructure` are empty scaffolds.
+- No auth framework, no messaging, no gateway operational verification.
 - No coverage measurement.
 
 ## Next technical milestones (established)
